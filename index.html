@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <!-- Painel do Bot Companheiro e Radar + Botão Tela Cheia -->
+      <!-- Painel do Bot Companheiro e Radar + Botões de Ação Topo -->
       <div class="companion-radar-panel">
         <div class="top-actions-row">
           <button id="btn-fullscreen" class="hud-mini-btn glass-panel" title="Tela Cheia">⛶</button>
@@ -88,22 +88,32 @@
     <!-- Notificações Flutuantes no Jogo -->
     <div id="game-toast" class="game-toast hidden"></div>
 
-    <!-- ZONA TOUCH DINÂMICA PARA CELULAR -->
-    <!-- Área Esquerda: Joystick Analógico Flutuante que aparece ao tocar -->
-    <div id="touch-zone-left" class="touch-zone touch-zone-left">
+    <!-- CONTROLES TOUCH MOBILE COMPLETOS -->
+    <!-- 1. ESQUERDA: BOTÕES DIRECIONAIS CLAROS + ÁREA ANALÓGICA -->
+    <div id="touch-controls-left" class="touch-controls-left">
+      <div class="dpad-cluster">
+        <button id="btn-left" class="t-btn btn-dir btn-dir-left" aria-label="Mover para Esquerda">
+          <span class="btn-icon">◀</span>
+          <span class="btn-label">ESQUERDA</span>
+        </button>
+        <button id="btn-right" class="t-btn btn-dir btn-dir-right" aria-label="Mover para Direita">
+          <span class="btn-icon">▶</span>
+          <span class="btn-label">DIREITA</span>
+        </button>
+      </div>
+
+      <!-- Joystick Analógico Flutuante que acompanha o dedo -->
       <div id="virtual-joystick" class="virtual-joystick hidden">
         <div class="joystick-base">
           <div id="joystick-stick" class="joystick-stick"></div>
           <div class="joystick-ring"></div>
         </div>
       </div>
-      <div class="touch-hint-left">Arraste aqui para mover 🕹️</div>
     </div>
 
-    <!-- Área Direita: Botões de Ação Ergonômicos e Gestos Touch -->
+    <!-- 2. DIREITA: BOTÕES DE AÇÃO TOUCH ERGONÔMICOS -->
     <div id="touch-controls-right" class="touch-controls-right">
       <div class="action-cluster">
-        <!-- Linha Superior: Disparo e Dash -->
         <div class="action-row">
           <button id="btn-dash" class="t-action-btn btn-dash" aria-label="Dash">
             <span class="btn-icon">⚡</span>
@@ -114,7 +124,6 @@
             <span class="btn-label">TIRO</span>
           </button>
         </div>
-        <!-- Linha Inferior: Espada e Super Pulo -->
         <div class="action-row">
           <button id="btn-attack" class="t-action-btn btn-attack" aria-label="Espada">
             <span class="btn-icon">⚔️</span>
@@ -131,15 +140,15 @@
     <!-- Tela Inicial / Menu -->
     <div id="start-screen" class="screen-modal active">
       <div class="modal-card">
-        <div class="badge-hero">⚔️ VERSÃO ÉPICA 2.0 • CELULAR & PC</div>
+        <div class="badge-hero">⚔️ VERSÃO ÉPICA 2.0 • TOUCH NO CELULAR</div>
         <h1 class="game-title">AS AVENTURAS DE <span class="highlight">GABRIEL</span></h1>
         <p class="subtitle">O Mundo das Plataformas & Bots Autônomos</p>
 
         <div class="features-grid">
           <div class="feat-card">
             <span class="feat-icon">📱</span>
-            <h4>Touch no Celular</h4>
-            <p>Analógico virtual flutuante na tela esquerda e botões ergonômicos na direita.</p>
+            <h4>Botões Touch Visíveis</h4>
+            <p>Botões ◀ e ▶ grandes na esquerda para andar e ⬆️ na direita para pular.</p>
           </div>
           <div class="feat-card">
             <span class="feat-icon">🤖</span>
@@ -154,15 +163,15 @@
           <div class="feat-card">
             <span class="feat-icon">✨</span>
             <h4>Gráficos HD Retina</h4>
-            <p>Parallax espacial, brilho neon, partículas e tela cheia sem travamentos.</p>
+            <p>Parallax espacial, iluminação neon, partículas e tela cheia.</p>
           </div>
         </div>
 
         <div class="controls-guide">
-          <h3>🎮 COMO CONTROLAR:</h3>
+          <h3>🎮 CONTROLES:</h3>
           <div class="keys-list">
-            <span><b>📱 No Celular:</b> Arraste o polegar na esquerda para andar; toque na direita para pular, atacar e dash.</span>
-            <span><b>💻 No Teclado:</b> <kbd>A</kbd>/<kbd>D</kbd> mover, <kbd>Espaço</kbd> pulo duplo, <kbd>J</kbd> espada, <kbd>K</kbd> tiro, <kbd>L</kbd> dash.</span>
+            <span><b>📱 Celular:</b> Segure <b>◀</b> ou <b>▶</b> para andar; toque em <b>PULAR</b>, <b>ESPADA</b>, <b>TIRO</b> e <b>DASH</b>.</span>
+            <span><b>💻 Teclado:</b> <kbd>A</kbd>/<kbd>D</kbd> andar, <kbd>Espaço</kbd> pulo duplo, <kbd>J</kbd> espada, <kbd>K</kbd> tiro, <kbd>L</kbd> dash.</span>
           </div>
         </div>
 

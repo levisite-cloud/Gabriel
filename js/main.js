@@ -1,6 +1,6 @@
 /**
  * Master Game Controller & Loop (Otimizado para Mobile Touch & Desktop)
- * Loop principal, analógico virtual touch dinâmico, câmera suave, HUD e combates
+ * Controles táteis diretos ◀ e ▶, suporte multi-touch, analógico e botões de ação
  */
 
 class Game {
@@ -37,14 +37,12 @@ class Game {
       analogX: 0
     };
 
-    // Controle Touch / Joystick Analógico Virtual
+    // Joystick Analógico Flutuante
     this.joystick = {
       active: false,
       touchId: null,
       startX: 0,
       startY: 0,
-      currentX: 0,
-      currentY: 0,
       maxRadius: 45,
       container: document.getElementById('virtual-joystick'),
       stick: document.getElementById('joystick-stick')
@@ -80,7 +78,6 @@ class Game {
   }
 
   resizeCanvas() {
-    // Escala Retina / High-DPI para celular (com limite em 2.2 para 60fps cravados)
     const dpr = Math.min(window.devicePixelRatio || 1, 2.2);
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -114,42 +111,120 @@ class Game {
   }
 
   initTouchControls() {
-    const leftZone = document.getElementById('touch-zone-left');
-    const touchHint = document.querySelector('.touch-hint-left');
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const btnJump = document.getElementById('btn-jump');
+    const btnAttack = document.getElementById('btn-attack');
+    const btnShoot = document.getElementById('btn-shoot');
+    const btnDash = document.getElementById('btn-dash');
 
-    if (!leftZone) return;
+    // Helper para vincular eventos táteis múltiplos sem falhar no mobile
+    const bindDirButton = (btn, onDown, onUp) => {
+      if (!btn) return;
 
-    // 1. INÍCIO DO TOQUE NA ZONA ESQUERDA (Spawn do Analógico Virtual no dedo)
-    leftZone.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      if (this.joystick.active) return;
+      const handleDown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDown();
+        btn.classList.add('active');
+        this.vibrate(20);
+      };
 
-      const touch = e.changedTouches[0];
-      this.joystick.active = true;
-      this.joystick.touchId = touch.identifier;
-      this.joystick.startX = touch.clientX;
-      this.joystick.startY = touch.clientY;
-      this.joystick.currentX = touch.clientX;
-      this.joystick.currentY = touch.clientY;
+      const handleUp = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onUp();
+        btn.classList.remove('active');
+      };
 
-      // Posiciona o elemento visual do joystick exatamente onde o jogador tocou
-      if (this.joystick.container) {
-        this.joystick.container.style.left = `${touch.clientX}px`;
-        this.joystick.container.style.top = `${touch.clientY}px`;
-        this.joystick.container.classList.remove('hidden');
+      btn.addEventListener('pointerdown', handleDown);
+      btn.addEventListener('pointerup', handleUp);
+      btn.addEventListener('pointercancel', handleUp);
+      btn.addEventListener('pointerleave', handleUp);
+
+      btn.addEventListener('touchstart', handleDown, { passive: false });
+      btn.addEventListener('touchend', handleUp, { passive: false });
+      btn.addEventListener('touchcancel', handleUp, { passive: false });
+    };
+
+    // 1. BOTÃO ESQUERDA (◀)
+    bindDirButton(btnLeft, () => {
+      this.input.left = true;
+      this.input.right = false;
+      this.input.analogX = -1;
+    }, () => {
+      this.input.left = false;
+      if (!this.input.right) this.input.analogX = 0;
+    });
+
+    // 2. BOTÃO DIREITA (▶)
+    bindDirButton(btnRight, () => {
+      this.input.right = true;
+      this.input.left = false;
+      this.input.analogX = 1;
+    }, () => {
+      this.input.right = false;
+      if (!this.input.left) this.input.analogX = 0;
+    });
+
+    // 3. BOTÕES DE AÇÃO (PULAR, ESPADA, TIRO, DASH)
+    const bindActionButton = (btn, onTrigger) => {
+      if (!btn) return;
+
+      const trigger = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onTrigger();
+        btn.classList.add('active');
+        this.vibrate(25);
+        setTimeout(() => btn.classList.remove('active'), 120);
+      };
+
+      btn.addEventListener('pointerdown', trigger);
+      btn.addEventListener('touchstart', trigger, { passive: false });
+    };
+
+    bindActionButton(btnJump, () => {
+      this.input.jumpPressed = true;
+      this.input.jump = true;
+    });
+
+    bindActionButton(btnAttack, () => {
+      this.input.attackPressed = true;
+    });
+
+    bindActionButton(btnShoot, () => {
+      this.input.shootPressed = true;
+    });
+
+    bindActionButton(btnDash, () => {
+      this.input.dashPressed = true;
+    });
+
+    // 4. TOQUE DIRETO NA TELA (LADO ESQUERDO DO CANVAS)
+    // Se o jogador tocar ou arrastar em qualquer lugar no lado esquerdo da tela:
+    window.addEventListener('touchstart', (e) => {
+      if (this.state !== 'PLAYING') return;
+
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        // Se o toque for na metade esquerda da tela e não for nos botões
+        if (touch.clientX < window.innerWidth * 0.45 && !touch.target.closest('button')) {
+          this.joystick.active = true;
+          this.joystick.touchId = touch.identifier;
+          this.joystick.startX = touch.clientX;
+          this.joystick.startY = touch.clientY;
+
+          if (this.joystick.container) {
+            this.joystick.container.style.left = `${touch.clientX}px`;
+            this.joystick.container.style.top = `${touch.clientY}px`;
+            this.joystick.container.classList.remove('hidden');
+          }
+        }
       }
+    }, { passive: true });
 
-      if (this.joystick.stick) {
-        this.joystick.stick.style.transform = 'translate(0px, 0px)';
-      }
-
-      if (touchHint) touchHint.classList.add('hidden');
-      this.vibrate(15);
-    }, { passive: false });
-
-    // 2. MOVIMENTO DO DEDO (Cálculo Analógico e Direcional)
-    leftZone.addEventListener('touchmove', (e) => {
-      e.preventDefault();
+    window.addEventListener('touchmove', (e) => {
       if (!this.joystick.active) return;
 
       for (let i = 0; i < e.changedTouches.length; i++) {
@@ -164,12 +239,10 @@ class Game {
           const stickX = Math.cos(angle) * clampDist;
           const stickY = Math.sin(angle) * clampDist;
 
-          // Atualiza visual da haste do stick
           if (this.joystick.stick) {
             this.joystick.stick.style.transform = `translate(${stickX}px, ${stickY}px)`;
           }
 
-          // Normaliza valor de -1 a 1 para velocidade analógica suave
           const normX = stickX / this.joystick.maxRadius;
           this.input.analogX = normX;
 
@@ -184,32 +257,27 @@ class Game {
             this.input.right = false;
           }
 
-          // Se empurrar o analógico para cima com força, pula!
           if (dy < -35 && !this.input.jump) {
             this.input.jumpPressed = true;
             this.input.jump = true;
-            this.vibrate(20);
-          } else if (dy >= -20) {
-            this.input.jump = false;
           }
-
           break;
         }
       }
-    }, { passive: false });
+    }, { passive: true });
 
-    // 3. FIM DO TOQUE (Liberação do Analógico)
-    const endTouch = (e) => {
+    const endScreenTouch = (e) => {
       if (!this.joystick.active) return;
       for (let i = 0; i < e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === this.joystick.touchId) {
           this.joystick.active = false;
           this.joystick.touchId = null;
-          this.input.left = false;
-          this.input.right = false;
-          this.input.analogX = 0;
-          this.input.jump = false;
-
+          // Só reseta se os botões físicos não estiverem pressionados
+          if (!btnLeft.classList.contains('active') && !btnRight.classList.contains('active')) {
+            this.input.left = false;
+            this.input.right = false;
+            this.input.analogX = 0;
+          }
           if (this.joystick.container) {
             this.joystick.container.classList.add('hidden');
           }
@@ -218,31 +286,8 @@ class Game {
       }
     };
 
-    leftZone.addEventListener('touchend', endTouch, { passive: false });
-    leftZone.addEventListener('touchcancel', endTouch, { passive: false });
-
-    // ==========================================
-    // 4. BOTÕES DE AÇÃO TOUCH (DIREITA) ERGONÔMICOS
-    // ==========================================
-    const bindTouchAction = (id, onTrigger) => {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-
-      const trigger = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onTrigger();
-        this.vibrate(25);
-      };
-
-      btn.addEventListener('touchstart', trigger, { passive: false });
-      btn.addEventListener('mousedown', trigger);
-    };
-
-    bindTouchAction('btn-jump', () => { this.input.jumpPressed = true; });
-    bindTouchAction('btn-attack', () => { this.input.attackPressed = true; });
-    bindTouchAction('btn-shoot', () => { this.input.shootPressed = true; });
-    bindTouchAction('btn-dash', () => { this.input.dashPressed = true; });
+    window.addEventListener('touchend', endScreenTouch, { passive: true });
+    window.addEventListener('touchcancel', endScreenTouch, { passive: true });
   }
 
   initEvents() {
@@ -290,10 +335,17 @@ class Game {
       }
     });
 
-    // Modais e Início
-    document.getElementById('btn-start').addEventListener('click', () => this.startGame());
-    document.getElementById('btn-restart').addEventListener('click', () => this.restartGame());
-    document.getElementById('btn-victory-restart').addEventListener('click', () => this.restartGame());
+    // Modais e Início (Suporte direto a clique e toque)
+    const attachStart = (id, action) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('click', (e) => { e.preventDefault(); action(); });
+      el.addEventListener('touchend', (e) => { e.preventDefault(); action(); }, { passive: false });
+    };
+
+    attachStart('btn-start', () => this.startGame());
+    attachStart('btn-restart', () => this.restartGame());
+    attachStart('btn-victory-restart', () => this.restartGame());
   }
 
   toggleAudio() {
@@ -324,7 +376,7 @@ class Game {
       window.soundEngine.init();
       window.soundEngine.startBGM();
     }
-    this.showToast('🚀 Gabriel no Mundo dos Bots! Toque na tela para controlar!');
+    this.showToast('🚀 Gabriel na Aventura! Use os botões na tela para jogar!');
   }
 
   triggerGameOver() {
@@ -375,7 +427,7 @@ class Game {
       plat.update();
     }
 
-    // Atualiza Gabriel com os inputs (teclado ou analógico touch)
+    // Atualiza Gabriel com os inputs (teclado, botões táteis ou analógico)
     this.player.update(this.input, this.world.platforms, this.projectiles);
 
     // Reseta flags de clique único

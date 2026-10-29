@@ -47,7 +47,7 @@ body, html {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(0, 242, 254, 0.08);
 }
 
-/* HUD Overlay */
+/* HUD Superior */
 .hud-overlay {
   position: absolute;
   top: max(10px, env(safe-area-inset-top));
@@ -61,7 +61,7 @@ body, html {
   gap: 8px;
 }
 
-/* Player HUD Card */
+/* Card Jogador Gabriel */
 .player-hud-card {
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@ body, html {
   text-align: right;
 }
 
-/* Stats Card */
+/* Placar de Coleta */
 .stats-card {
   display: flex;
   gap: 12px;
@@ -184,7 +184,7 @@ body, html {
 #gem-counter { color: #00f2fe; }
 #score-counter { color: #a8ff78; }
 
-/* Companion, Radar e Mini Botões */
+/* Companion, Radar e Botões Superiores */
 .companion-radar-panel {
   display: flex;
   flex-direction: column;
@@ -200,7 +200,7 @@ body, html {
 }
 
 .hud-mini-btn {
-  background: rgba(13, 21, 40, 0.8);
+  background: rgba(13, 21, 40, 0.85);
   border: 1px solid rgba(0, 242, 254, 0.4);
   color: #00f2fe;
   font-size: 14px;
@@ -211,12 +211,6 @@ body, html {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.1s, background 0.1s;
-}
-
-.hud-mini-btn:active {
-  transform: scale(0.9);
-  background: rgba(0, 242, 254, 0.3);
 }
 
 .companion-badge {
@@ -268,57 +262,76 @@ body, html {
 }
 
 /* ========================================================
-   ZONA TOUCH & ANALÓGICO FLUTUANTE PARA CELULAR
+   CONTROLES TOUCH: D-PAD (ESQUERDA)
    ======================================================== */
-.touch-zone-left {
+.touch-controls-left {
   position: absolute;
-  top: 70px;
-  bottom: 0;
-  left: 0;
-  width: 48vw;
-  z-index: 15;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: max(20px, env(safe-area-inset-left));
+  z-index: 40;
   touch-action: none;
+  pointer-events: auto;
 }
 
-.touch-hint-left {
-  position: absolute;
-  bottom: max(35px, env(safe-area-inset-bottom));
-  left: max(30px, env(safe-area-inset-left));
+.dpad-cluster {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-dir {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
+  border: 2.5px solid #00f2fe;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4), inset 0 0 10px rgba(0, 242, 254, 0.2);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  transition: transform 0.08s ease, background 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-dir .btn-icon {
+  font-size: 26px;
+  line-height: 1;
+  color: #00f2fe;
+  filter: drop-shadow(0 0 6px #00f2fe);
+}
+
+.btn-dir .btn-label {
   font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(0, 242, 254, 0.7);
-  background: rgba(13, 21, 40, 0.5);
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px dashed rgba(0, 242, 254, 0.3);
-  pointer-events: none;
-  animation: hint-float 2s ease-in-out infinite;
-  transition: opacity 0.4s;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  color: #e0f7fa;
 }
 
-.touch-hint-left.hidden {
-  opacity: 0;
-}
-
-@keyframes hint-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.btn-dir:active, .btn-dir.active {
+  transform: scale(0.9);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.7) 0%, rgba(0, 119, 182, 0.9) 100%);
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
 }
 
 /* Joystick Analógico Flutuante */
 .virtual-joystick {
-  position: absolute;
+  position: fixed;
   width: 120px;
   height: 120px;
   pointer-events: none;
   transform: translate(-50%, -50%);
-  z-index: 30;
+  z-index: 50;
   transition: opacity 0.15s ease-out;
 }
 
 .virtual-joystick.hidden {
   opacity: 0;
+  display: none;
 }
 
 .joystick-base {
@@ -328,7 +341,7 @@ body, html {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(0, 242, 254, 0.25) 0%, rgba(13, 21, 40, 0.75) 100%);
   border: 2px solid rgba(0, 242, 254, 0.6);
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.35), inset 0 0 15px rgba(0, 242, 254, 0.2);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,27 +356,28 @@ body, html {
 }
 
 .joystick-stick {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #00f2fe, #0077b6);
   border: 2px solid #ffffff;
   box-shadow: 0 0 14px rgba(0, 242, 254, 0.85);
   position: absolute;
-  top: calc(50% - 24px);
-  left: calc(50% - 24px);
+  top: calc(50% - 23px);
+  left: calc(50% - 23px);
   will-change: transform;
 }
 
 /* ========================================================
-   BOTÕES DE AÇÃO TOUCH (DIREITA) ERGONÔMICOS
+   CONTROLES TOUCH: BOTÕES DE AÇÃO (DIREITA)
    ======================================================== */
 .touch-controls-right {
   position: absolute;
-  bottom: max(16px, env(safe-area-inset-bottom));
-  right: max(16px, env(safe-area-inset-right));
-  z-index: 25;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  right: max(20px, env(safe-area-inset-right));
+  z-index: 40;
   touch-action: none;
+  pointer-events: auto;
 }
 
 .action-cluster {
@@ -385,19 +399,18 @@ body, html {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(13, 21, 40, 0.78);
+  background: rgba(13, 21, 40, 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #fff;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  user-select: none;
   touch-action: none;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
   will-change: transform;
 }
 
-.t-action-btn:active {
+.t-action-btn:active, .t-action-btn.active {
   transform: scale(0.88);
 }
 
@@ -405,7 +418,7 @@ body, html {
   width: 68px;
   height: 68px;
   border: 2.5px solid #39ff14;
-  background: radial-gradient(circle, rgba(57, 255, 20, 0.35) 0%, rgba(13, 21, 40, 0.8) 100%);
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.35) 0%, rgba(13, 21, 40, 0.85) 100%);
   box-shadow: 0 0 18px rgba(57, 255, 20, 0.4);
 }
 
@@ -413,7 +426,7 @@ body, html {
   width: 60px;
   height: 60px;
   border: 2.5px solid #ff416c;
-  background: radial-gradient(circle, rgba(255, 65, 108, 0.35) 0%, rgba(13, 21, 40, 0.8) 100%);
+  background: radial-gradient(circle, rgba(255, 65, 108, 0.35) 0%, rgba(13, 21, 40, 0.85) 100%);
   box-shadow: 0 0 16px rgba(255, 65, 108, 0.4);
 }
 
@@ -421,7 +434,7 @@ body, html {
   width: 52px;
   height: 52px;
   border: 2px solid #00f2fe;
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(13, 21, 40, 0.8) 100%);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
   box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
 }
 
@@ -429,7 +442,7 @@ body, html {
   width: 52px;
   height: 52px;
   border: 2px solid #ffd700;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(13, 21, 40, 0.8) 100%);
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
   box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
 }
 
@@ -440,6 +453,8 @@ body, html {
 
 .btn-jump .btn-icon {
   font-size: 24px;
+  color: #39ff14;
+  filter: drop-shadow(0 0 6px #39ff14);
 }
 
 .btn-label {
@@ -464,7 +479,7 @@ body, html {
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
   padding: 8px 18px;
   border-radius: 24px;
-  z-index: 15;
+  z-index: 30;
   pointer-events: none;
   transition: opacity 0.3s;
 }
@@ -498,7 +513,7 @@ body, html {
   font-size: 12px;
   font-weight: 700;
   pointer-events: none;
-  z-index: 50;
+  z-index: 60;
   transition: opacity 0.3s, transform 0.3s;
   text-align: center;
   max-width: 90vw;
@@ -509,11 +524,11 @@ body, html {
   transform: translate(-50%, -15px);
 }
 
-/* Modals */
+/* Modais */
 .screen-modal {
   position: absolute;
   inset: 0;
-  background: rgba(3, 7, 18, 0.88);
+  background: rgba(3, 7, 18, 0.9);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   display: flex;
@@ -539,7 +554,7 @@ body, html {
   width: 95%;
   max-height: 90vh;
   overflow-y: auto;
-  background: linear-gradient(145deg, rgba(20, 30, 58, 0.95), rgba(8, 14, 28, 0.98));
+  background: linear-gradient(145deg, rgba(20, 30, 58, 0.96), rgba(8, 14, 28, 0.98));
   border: 2px solid rgba(0, 242, 254, 0.4);
   border-radius: 20px;
   padding: 24px;
@@ -659,17 +674,18 @@ kbd {
 
 .btn-primary {
   width: 100%;
-  padding: 13px;
+  padding: 14px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
   color: #050b1a;
   font-family: 'Orbitron', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
   letter-spacing: 1px;
   cursor: pointer;
   box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+  touch-action: manipulation;
 }
 
 .btn-primary:active {
@@ -700,11 +716,6 @@ kbd {
 
 .results-box b { color: #00f2fe; }
 
-/* Desktop Adaptations */
-@media (min-width: 1024px) {
-  .touch-hint-left { display: none; }
-}
-
 /* Telas Pequenas de Celular */
 @media (max-width: 600px) {
   .player-hud-card { padding: 4px 8px; gap: 6px; }
@@ -713,6 +724,7 @@ kbd {
   .stats-card { padding: 4px 8px; gap: 8px; }
   .stat-item { font-size: 11px; }
   .companion-badge { display: none; }
+  .btn-dir { width: 60px; height: 60px; }
   .btn-jump { width: 62px; height: 62px; }
   .btn-attack { width: 54px; height: 54px; }
   .btn-shoot, .btn-dash { width: 46px; height: 46px; }
