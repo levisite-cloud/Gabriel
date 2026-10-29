@@ -39,34 +39,88 @@ body, html {
 
 /* Glassmorphism Panels */
 .glass-panel {
-  background: rgba(13, 21, 40, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(13, 21, 40, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 242, 254, 0.25);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(0, 242, 254, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.35);
 }
 
-/* HUD Superior */
+/* ========================================================
+   BOTÃO FLUTUANTE DISCRETO PARA OCULTAR/MOSTRAR HUD
+   ======================================================== */
+.hud-toggle-btn {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 21, 40, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 242, 254, 0.5);
+  border-radius: 20px;
+  padding: 5px 14px;
+  color: #00f2fe;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25);
+  touch-action: manipulation;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.hud-toggle-btn:active {
+  transform: translateX(-50%) scale(0.92);
+  background: rgba(0, 242, 254, 0.3);
+}
+
+.hud-toggle-btn.is-hidden {
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+/* ========================================================
+   HUD OVERLAY COM TRANSIÇÃO SUAVE (MOSTRAR / ESCONDER)
+   ======================================================== */
 .hud-overlay {
   position: absolute;
-  top: max(10px, env(safe-area-inset-top));
+  top: max(38px, calc(env(safe-area-inset-top) + 26px));
   left: max(10px, env(safe-area-inset-left));
   right: max(10px, env(safe-area-inset-right));
+  pointer-events: none;
+  z-index: 20;
+}
+
+.hud-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  pointer-events: none;
-  z-index: 20;
+  width: 100%;
   gap: 8px;
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+  will-change: transform, opacity;
 }
 
-/* Card Jogador Gabriel */
+.hud-content.hud-hidden {
+  transform: translateY(-140%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Card Gabriel */
 .player-hud-card {
   display: flex;
   align-items: center;
-  padding: 6px 12px;
-  gap: 10px;
+  padding: 5px 10px;
+  gap: 8px;
   pointer-events: auto;
 }
 
@@ -74,36 +128,32 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .avatar-icon {
-  font-size: 20px;
-  width: 36px;
-  height: 36px;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
-  border: 2px solid #fff;
+  border: 1.5px solid #fff;
 }
 
 .avatar-tag {
   font-family: 'Orbitron', sans-serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
-  letter-spacing: 1px;
   color: #00f2fe;
-  margin-top: 2px;
 }
 
 .bars-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 130px;
+  gap: 3px;
+  min-width: 110px;
 }
 
 .bar-wrapper {
@@ -114,9 +164,9 @@ body, html {
 
 .bar-label {
   font-family: 'Orbitron', sans-serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 900;
-  width: 20px;
+  width: 18px;
 }
 
 .hp-track .bar-label { color: #ff416c; }
@@ -124,9 +174,9 @@ body, html {
 
 .bar-track {
   flex: 1;
-  height: 10px;
+  height: 8px;
   background: rgba(0, 0, 0, 0.55);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.15);
   position: relative;
@@ -134,34 +184,32 @@ body, html {
 
 .bar-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .hp-fill {
   background: linear-gradient(90deg, #ff4b2b, #ff416c);
-  box-shadow: 0 0 8px rgba(255, 65, 108, 0.6);
 }
 
 .sp-fill {
   background: linear-gradient(90deg, #00b4db, #00f2fe);
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
 }
 
 .bar-val {
   font-family: 'Orbitron', sans-serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   color: #e0e0e0;
-  width: 48px;
+  width: 42px;
   text-align: right;
 }
 
 /* Placar de Coleta */
 .stats-card {
   display: flex;
-  gap: 12px;
-  padding: 6px 14px;
+  gap: 10px;
+  padding: 5px 12px;
   align-items: center;
   pointer-events: auto;
 }
@@ -171,42 +219,41 @@ body, html {
   align-items: center;
   gap: 4px;
   font-family: 'Orbitron', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .stat-icon {
-  font-size: 15px;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+  font-size: 14px;
 }
 
 #coin-counter { color: #ffd700; }
 #gem-counter { color: #00f2fe; }
 #score-counter { color: #a8ff78; }
 
-/* Companion, Radar e Botões Superiores */
+/* Radar e Botões Superiores */
 .companion-radar-panel {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 4px;
   pointer-events: auto;
 }
 
 .top-actions-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .hud-mini-btn {
   background: rgba(13, 21, 40, 0.85);
   border: 1px solid rgba(0, 242, 254, 0.4);
   color: #00f2fe;
-  font-size: 14px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  font-size: 13px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,32 +263,25 @@ body, html {
 .companion-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 10px;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 9px;
   font-family: 'Orbitron', sans-serif;
 }
 
 .companion-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #39ff14;
-  box-shadow: 0 0 8px #39ff14;
-  animation: pulse-dot 1.5s infinite;
-}
-
-@keyframes pulse-dot {
-  0% { transform: scale(0.8); opacity: 0.7; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0.7; }
+  box-shadow: 0 0 6px #39ff14;
 }
 
 .companion-text { color: #c0caf5; }
 .companion-text b { color: #39ff14; }
 
 .radar-box {
-  padding: 4px;
+  padding: 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -249,16 +289,16 @@ body, html {
 
 #radarCanvas {
   background: rgba(4, 9, 20, 0.9);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid rgba(0, 242, 254, 0.3);
 }
 
 .radar-label {
   font-family: 'Orbitron', sans-serif;
-  font-size: 7px;
+  font-size: 6px;
   color: #00f2fe;
-  letter-spacing: 1px;
-  margin-top: 2px;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
 }
 
 /* ========================================================
@@ -266,26 +306,32 @@ body, html {
    ======================================================== */
 .touch-controls-left {
   position: absolute;
-  bottom: max(20px, env(safe-area-inset-bottom));
-  left: max(20px, env(safe-area-inset-left));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
   z-index: 40;
   touch-action: none;
   pointer-events: auto;
+  opacity: 0.82;
+  transition: opacity 0.2s;
+}
+
+.touch-controls-left:active {
+  opacity: 1;
 }
 
 .dpad-cluster {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: center;
 }
 
 .btn-dir {
-  width: 66px;
-  height: 66px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
-  border: 2.5px solid #00f2fe;
-  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4), inset 0 0 10px rgba(0, 242, 254, 0.2);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.25) 0%, rgba(13, 21, 40, 0.85) 100%);
+  border: 2px solid #00f2fe;
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.35);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -293,14 +339,14 @@ body, html {
   justify-content: center;
   cursor: pointer;
   touch-action: none;
-  transition: transform 0.08s ease, background 0.08s ease, box-shadow 0.08s ease;
+  transition: transform 0.08s ease, background 0.08s ease;
 }
 
 .btn-dir .btn-icon {
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
   color: #00f2fe;
-  filter: drop-shadow(0 0 6px #00f2fe);
+  filter: drop-shadow(0 0 5px #00f2fe);
 }
 
 .btn-dir .btn-label {
@@ -314,15 +360,15 @@ body, html {
 
 .btn-dir:active, .btn-dir.active {
   transform: scale(0.9);
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.7) 0%, rgba(0, 119, 182, 0.9) 100%);
-  box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.6) 0%, rgba(0, 119, 182, 0.85) 100%);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
 }
 
 /* Joystick Analógico Flutuante */
 .virtual-joystick {
   position: fixed;
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   pointer-events: none;
   transform: translate(-50%, -50%);
   z-index: 50;
@@ -339,9 +385,9 @@ body, html {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.25) 0%, rgba(13, 21, 40, 0.75) 100%);
-  border: 2px solid rgba(0, 242, 254, 0.6);
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.2) 0%, rgba(13, 21, 40, 0.7) 100%);
+  border: 2px solid rgba(0, 242, 254, 0.5);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -356,15 +402,15 @@ body, html {
 }
 
 .joystick-stick {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #00f2fe, #0077b6);
   border: 2px solid #ffffff;
-  box-shadow: 0 0 14px rgba(0, 242, 254, 0.85);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.8);
   position: absolute;
-  top: calc(50% - 23px);
-  left: calc(50% - 23px);
+  top: calc(50% - 21px);
+  left: calc(50% - 21px);
   will-change: transform;
 }
 
@@ -373,23 +419,29 @@ body, html {
    ======================================================== */
 .touch-controls-right {
   position: absolute;
-  bottom: max(20px, env(safe-area-inset-bottom));
-  right: max(20px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right: max(16px, env(safe-area-inset-right));
   z-index: 40;
   touch-action: none;
   pointer-events: auto;
+  opacity: 0.82;
+  transition: opacity 0.2s;
+}
+
+.touch-controls-right:active {
+  opacity: 1;
 }
 
 .action-cluster {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-end;
 }
 
 .action-row {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -404,9 +456,9 @@ body, html {
   -webkit-backdrop-filter: blur(8px);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
   touch-action: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform 0.08s ease;
   will-change: transform;
 }
 
@@ -415,39 +467,39 @@ body, html {
 }
 
 .btn-jump {
-  width: 68px;
-  height: 68px;
+  width: 66px;
+  height: 66px;
   border: 2.5px solid #39ff14;
-  background: radial-gradient(circle, rgba(57, 255, 20, 0.35) 0%, rgba(13, 21, 40, 0.85) 100%);
-  box-shadow: 0 0 18px rgba(57, 255, 20, 0.4);
+  background: radial-gradient(circle, rgba(57, 255, 20, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
+  box-shadow: 0 0 16px rgba(57, 255, 20, 0.35);
 }
 
 .btn-attack {
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   border: 2.5px solid #ff416c;
-  background: radial-gradient(circle, rgba(255, 65, 108, 0.35) 0%, rgba(13, 21, 40, 0.85) 100%);
-  box-shadow: 0 0 16px rgba(255, 65, 108, 0.4);
+  background: radial-gradient(circle, rgba(255, 65, 108, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
+  box-shadow: 0 0 14px rgba(255, 65, 108, 0.35);
 }
 
 .btn-shoot {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   border: 2px solid #00f2fe;
-  background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
-  box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.25) 0%, rgba(13, 21, 40, 0.85) 100%);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
 }
 
 .btn-dash {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   border: 2px solid #ffd700;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(13, 21, 40, 0.85) 100%);
-  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(13, 21, 40, 0.85) 100%);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
 }
 
 .btn-icon {
-  font-size: 20px;
+  font-size: 19px;
   line-height: 1;
 }
 
@@ -466,19 +518,17 @@ body, html {
   color: #fff;
 }
 
-/* ========================================================
-   ORIENTAÇÃO E AVISO PAISAGEM
-   ======================================================== */
+/* Aviso Paisagem */
 .orientation-hint {
   position: absolute;
-  top: 75px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(13, 21, 40, 0.92);
   border: 1px solid #ffd700;
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-  padding: 8px 18px;
-  border-radius: 24px;
+  padding: 6px 16px;
+  border-radius: 20px;
   z-index: 30;
   pointer-events: none;
   transition: opacity 0.3s;
@@ -491,7 +541,7 @@ body, html {
 .hint-content {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 11px;
   font-family: 'Orbitron', sans-serif;
   color: #ffd700;
@@ -500,17 +550,17 @@ body, html {
 /* Toast */
 .game-toast {
   position: absolute;
-  top: max(80px, env(safe-area-inset-top));
+  top: max(75px, env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
   background: rgba(10, 20, 45, 0.92);
   border: 1px solid #00f2fe;
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4);
   color: #fff;
-  padding: 8px 20px;
-  border-radius: 30px;
+  padding: 6px 18px;
+  border-radius: 24px;
   font-family: 'Orbitron', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   pointer-events: none;
   z-index: 60;
@@ -550,14 +600,14 @@ body, html {
 }
 
 .modal-card {
-  max-width: 580px;
+  max-width: 560px;
   width: 95%;
   max-height: 90vh;
   overflow-y: auto;
   background: linear-gradient(145deg, rgba(20, 30, 58, 0.96), rgba(8, 14, 28, 0.98));
   border: 2px solid rgba(0, 242, 254, 0.4);
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 18px;
+  padding: 22px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.2);
   animation: modal-enter 0.3s ease-out;
@@ -576,7 +626,7 @@ body, html {
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
   font-weight: 800;
-  padding: 4px 12px;
+  padding: 3px 12px;
   border-radius: 20px;
   margin-bottom: 8px;
   letter-spacing: 1px;
@@ -584,7 +634,7 @@ body, html {
 
 .game-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   letter-spacing: 1.5px;
   color: #fff;
@@ -600,15 +650,15 @@ body, html {
 
 .subtitle {
   color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 16px;
+  font-size: 12px;
+  margin-bottom: 14px;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 14px;
   text-align: left;
 }
 
@@ -616,13 +666,13 @@ body, html {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px 10px;
 }
 
 .feat-icon {
-  font-size: 18px;
+  font-size: 17px;
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .feat-card h4 {
@@ -642,7 +692,7 @@ body, html {
   background: rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   padding: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   text-align: left;
 }
 
@@ -650,14 +700,14 @@ body, html {
   font-family: 'Orbitron', sans-serif;
   font-size: 10px;
   color: #ffd700;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   letter-spacing: 1px;
 }
 
 .keys-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   font-size: 11px;
   color: #e2e8f0;
 }
@@ -674,13 +724,13 @@ kbd {
 
 .btn-primary {
   width: 100%;
-  padding: 14px;
+  padding: 13px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
   color: #050b1a;
   font-family: 'Orbitron', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: 1px;
   cursor: pointer;
@@ -695,7 +745,7 @@ kbd {
 /* Danger / Victory Themes */
 .danger-theme { border-color: rgba(255, 65, 108, 0.6); }
 .danger-theme h2 { font-family: 'Orbitron', sans-serif; color: #ff416c; margin-bottom: 6px; }
-.danger-icon, .trophy-icon { font-size: 40px; margin-bottom: 6px; }
+.danger-icon, .trophy-icon { font-size: 38px; margin-bottom: 6px; }
 .danger-btn { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); color: #fff; }
 
 .victory-theme { border-color: rgba(255, 215, 0, 0.6); }
@@ -705,8 +755,8 @@ kbd {
 .results-box {
   background: rgba(0, 0, 0, 0.4);
   border-radius: 10px;
-  padding: 12px;
-  margin: 12px 0 16px 0;
+  padding: 10px;
+  margin: 10px 0 14px 0;
   display: flex;
   justify-content: space-around;
   font-family: 'Orbitron', sans-serif;
@@ -718,15 +768,19 @@ kbd {
 
 /* Telas Pequenas de Celular */
 @media (max-width: 600px) {
-  .player-hud-card { padding: 4px 8px; gap: 6px; }
-  .bars-container { min-width: 90px; }
-  .bar-val { font-size: 8px; width: 40px; }
-  .stats-card { padding: 4px 8px; gap: 8px; }
-  .stat-item { font-size: 11px; }
+  .hud-overlay {
+    top: max(32px, calc(env(safe-area-inset-top) + 20px));
+  }
+  .player-hud-card { padding: 3px 6px; gap: 5px; }
+  .bars-container { min-width: 80px; }
+  .bar-val { font-size: 7px; width: 36px; }
+  .stats-card { padding: 3px 6px; gap: 6px; }
+  .stat-item { font-size: 10px; }
   .companion-badge { display: none; }
-  .btn-dir { width: 60px; height: 60px; }
-  .btn-jump { width: 62px; height: 62px; }
-  .btn-attack { width: 54px; height: 54px; }
-  .btn-shoot, .btn-dash { width: 46px; height: 46px; }
+  .btn-dir { width: 56px; height: 56px; }
+  .btn-dir .btn-icon { font-size: 20px; }
+  .btn-jump { width: 58px; height: 58px; }
+  .btn-attack { width: 50px; height: 50px; }
+  .btn-shoot, .btn-dash { width: 44px; height: 44px; }
   .features-grid { grid-template-columns: 1fr; }
 }

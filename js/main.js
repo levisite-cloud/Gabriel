@@ -1,6 +1,6 @@
 /**
  * Master Game Controller & Loop (Otimizado para Mobile Touch & Desktop)
- * Controles táteis diretos ◀ e ▶, suporte multi-touch, analógico e botões de ação
+ * Controles táteis diretos ◀ e ▶, suporte multi-touch, opção de ocultar/mostrar HUD
  */
 
 class Game {
@@ -10,8 +10,9 @@ class Game {
     this.radarCanvas = document.getElementById('radarCanvas');
     this.radarCtx = this.radarCanvas.getContext('2d');
 
-    // Estado do Jogo
+    // Estado do Jogo e Visibilidade da HUD
     this.state = 'START'; // 'START', 'PLAYING', 'GAMEOVER', 'VICTORY'
+    this.hudVisible = true;
     this.lastTime = performance.now();
 
     // Câmera Dinâmica
@@ -110,6 +111,29 @@ class Game {
     }
   }
 
+  toggleHUD() {
+    this.hudVisible = !this.hudVisible;
+    const toggleBtn = document.getElementById('btn-toggle-hud');
+    const hudContent = document.getElementById('hud-content');
+    const toggleIcon = document.getElementById('toggle-hud-icon');
+    const toggleText = document.getElementById('toggle-hud-text');
+
+    if (this.hudVisible) {
+      if (hudContent) hudContent.classList.remove('hud-hidden');
+      if (toggleBtn) toggleBtn.classList.remove('is-hidden');
+      if (toggleIcon) toggleIcon.textContent = '👁️';
+      if (toggleText) toggleText.textContent = 'OCULTAR HUD';
+      this.showToast('👁️ Informações da Tela Exibidas');
+    } else {
+      if (hudContent) hudContent.classList.add('hud-hidden');
+      if (toggleBtn) toggleBtn.classList.add('is-hidden');
+      if (toggleIcon) toggleIcon.textContent = '🙈';
+      if (toggleText) toggleText.textContent = 'MOSTRAR HUD';
+      this.showToast('🙈 Janelas Ocultadas - Tela 100% Limpa!');
+    }
+    this.vibrate(20);
+  }
+
   initTouchControls() {
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');
@@ -118,7 +142,7 @@ class Game {
     const btnShoot = document.getElementById('btn-shoot');
     const btnDash = document.getElementById('btn-dash');
 
-    // Helper para vincular eventos táteis múltiplos sem falhar no mobile
+    // Helper para botões direcionais
     const bindDirButton = (btn, onDown, onUp) => {
       if (!btn) return;
 
@@ -167,7 +191,7 @@ class Game {
       if (!this.input.left) this.input.analogX = 0;
     });
 
-    // 3. BOTÕES DE AÇÃO (PULAR, ESPADA, TIRO, DASH)
+    // 3. BOTÕES DE AÇÃO
     const bindActionButton = (btn, onTrigger) => {
       if (!btn) return;
 
@@ -201,14 +225,12 @@ class Game {
       this.input.dashPressed = true;
     });
 
-    // 4. TOQUE DIRETO NA TELA (LADO ESQUERDO DO CANVAS)
-    // Se o jogador tocar ou arrastar em qualquer lugar no lado esquerdo da tela:
+    // 4. TOQUE LIVRE NA TELA (LADO ESQUERDO)
     window.addEventListener('touchstart', (e) => {
       if (this.state !== 'PLAYING') return;
 
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
-        // Se o toque for na metade esquerda da tela e não for nos botões
         if (touch.clientX < window.innerWidth * 0.45 && !touch.target.closest('button')) {
           this.joystick.active = true;
           this.joystick.touchId = touch.identifier;
@@ -272,7 +294,6 @@ class Game {
         if (e.changedTouches[i].identifier === this.joystick.touchId) {
           this.joystick.active = false;
           this.joystick.touchId = null;
-          // Só reseta se os botões físicos não estiverem pressionados
           if (!btnLeft.classList.contains('active') && !btnRight.classList.contains('active')) {
             this.input.left = false;
             this.input.right = false;
@@ -311,6 +332,9 @@ class Game {
       if (code === 'KeyK') {
         this.input.shootPressed = true;
       }
+      if (code === 'KeyH') {
+        this.toggleHUD();
+      }
       if (code === 'KeyM') {
         this.toggleAudio();
       }
@@ -322,6 +346,13 @@ class Game {
       if (code === 'KeyD' || code === 'ArrowRight') { this.input.right = false; this.input.analogX = 0; }
       if (code === 'KeyW' || code === 'ArrowUp' || code === 'Space') this.input.jump = false;
     });
+
+    // Botão de Ocultar / Mostrar Informações da Tela
+    const toggleBtn = document.getElementById('btn-toggle-hud');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => { e.preventDefault(); this.toggleHUD(); });
+      toggleBtn.addEventListener('touchend', (e) => { e.preventDefault(); this.toggleHUD(); }, { passive: false });
+    }
 
     // Botão de Áudio
     document.getElementById('btn-audio-toggle').addEventListener('click', () => this.toggleAudio());
@@ -335,7 +366,7 @@ class Game {
       }
     });
 
-    // Modais e Início (Suporte direto a clique e toque)
+    // Início e Reinício
     const attachStart = (id, action) => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -427,7 +458,7 @@ class Game {
       plat.update();
     }
 
-    // Atualiza Gabriel com os inputs (teclado, botões táteis ou analógico)
+    // Atualiza Gabriel com os inputs
     this.player.update(this.input, this.world.platforms, this.projectiles);
 
     // Reseta flags de clique único
@@ -573,24 +604,36 @@ class Game {
       if (this.camera.shake < 0.2) this.camera.shake = 0;
     }
 
-    // Atualiza HUD Visual
-    this.updateHUD();
-    this.renderRadar();
+    // Atualiza HUD Visual somente se estiver visível
+    if (this.hudVisible) {
+      this.updateHUD();
+      this.renderRadar();
+    }
   }
 
   updateHUD() {
     const hpPct = Math.max(0, (this.player.hp / this.player.maxHp) * 100);
     const spPct = Math.max(0, (this.player.sp / this.player.maxSp) * 100);
 
-    document.getElementById('hp-bar').style.width = `${hpPct}%`;
-    document.getElementById('hp-text').textContent = `${Math.ceil(this.player.hp)}/${this.player.maxHp}`;
-    document.getElementById('sp-bar').style.width = `${spPct}%`;
-    document.getElementById('sp-text').textContent = `${Math.ceil(this.player.sp)}/${this.player.maxSp}`;
+    const hpBar = document.getElementById('hp-bar');
+    const hpText = document.getElementById('hp-text');
+    const spBar = document.getElementById('sp-bar');
+    const spText = document.getElementById('sp-text');
 
-    document.getElementById('coin-counter').textContent = this.player.coins;
-    document.getElementById('gem-counter').textContent = this.player.gems;
-    document.getElementById('score-counter').textContent = String(this.player.score).padStart(5, '0');
-    document.getElementById('companion-status').textContent = this.companion.state;
+    if (hpBar) hpBar.style.width = `${hpPct}%`;
+    if (hpText) hpText.textContent = `${Math.ceil(this.player.hp)}/${this.player.maxHp}`;
+    if (spBar) spBar.style.width = `${spPct}%`;
+    if (spText) spText.textContent = `${Math.ceil(this.player.sp)}/${this.player.maxSp}`;
+
+    const coinCount = document.getElementById('coin-counter');
+    const gemCount = document.getElementById('gem-counter');
+    const scoreCount = document.getElementById('score-counter');
+    const compStatus = document.getElementById('companion-status');
+
+    if (coinCount) coinCount.textContent = this.player.coins;
+    if (gemCount) gemCount.textContent = this.player.gems;
+    if (scoreCount) scoreCount.textContent = String(this.player.score).padStart(5, '0');
+    if (compStatus) compStatus.textContent = this.companion.state;
   }
 
   renderRadar() {

@@ -16,71 +16,77 @@
   <div id="game-container">
     <canvas id="gameCanvas"></canvas>
 
+    <!-- BOTÃO FLUTUANTE PARA OCULTAR / MOSTRAR INFORMAÇÕES DA TELA -->
+    <button id="btn-toggle-hud" class="hud-toggle-btn" aria-label="Ocultar ou Mostrar Informações">
+      <span id="toggle-hud-icon">👁️</span>
+      <span id="toggle-hud-text" class="toggle-text">OCULTAR HUD</span>
+    </button>
+
     <!-- Aviso de Orientação Paisagem para Celular -->
     <div id="orientation-hint" class="orientation-hint hidden">
       <div class="hint-content">
         <span class="phone-icon">📱 ➔ 🔄</span>
-        <p>Gire o celular para jogar na horizontal (Paisagem)!</p>
+        <p>Gire o celular na horizontal para a melhor visão!</p>
       </div>
     </div>
 
-    <!-- HUD Superior Otimizado para Mobile e Desktop -->
+    <!-- HUD SUPERIOR COM INFORMAÇÕES (PODE SER OCULTADO A QUALQUER MOMENTO) -->
     <div id="hud" class="hud-overlay">
-      <!-- Painel Gabriel -->
-      <div class="player-hud-card glass-panel">
-        <div class="avatar-box">
-          <div class="avatar-icon">🎮</div>
-          <span class="avatar-tag">GABRIEL</span>
-        </div>
-        <div class="bars-container">
-          <!-- Barra de Vida -->
-          <div class="bar-wrapper">
-            <span class="bar-label">HP</span>
-            <div class="bar-track hp-track">
-              <div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
+      <div id="hud-content" class="hud-content">
+        <!-- 1. Painel Gabriel (HP e SP) -->
+        <div class="player-hud-card glass-panel">
+          <div class="avatar-box">
+            <div class="avatar-icon">🎮</div>
+            <span class="avatar-tag">GABRIEL</span>
+          </div>
+          <div class="bars-container">
+            <div class="bar-wrapper">
+              <span class="bar-label">HP</span>
+              <div class="bar-track hp-track">
+                <div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
+              </div>
+              <span id="hp-text" class="bar-val">100/100</span>
             </div>
-            <span id="hp-text" class="bar-val">100/100</span>
-          </div>
-          <!-- Barra de Energia / Dash -->
-          <div class="bar-wrapper">
-            <span class="bar-label">SP</span>
-            <div class="bar-track sp-track">
-              <div id="sp-bar" class="bar-fill sp-fill" style="width: 100%;"></div>
+            <div class="bar-wrapper">
+              <span class="bar-label">SP</span>
+              <div class="bar-track sp-track">
+                <div id="sp-bar" class="bar-fill sp-fill" style="width: 100%;"></div>
+              </div>
+              <span id="sp-text" class="bar-val">100/100</span>
             </div>
-            <span id="sp-text" class="bar-val">100/100</span>
           </div>
         </div>
-      </div>
 
-      <!-- Placar e Coletáveis -->
-      <div class="stats-card glass-panel">
-        <div class="stat-item">
-          <span class="stat-icon">🪙</span>
-          <span id="coin-counter" class="stat-value">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">💎</span>
-          <span id="gem-counter" class="stat-value">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">⭐</span>
-          <span id="score-counter" class="stat-value">00000</span>
-        </div>
-      </div>
-
-      <!-- Painel do Bot Companheiro e Radar + Botões de Ação Topo -->
-      <div class="companion-radar-panel">
-        <div class="top-actions-row">
-          <button id="btn-fullscreen" class="hud-mini-btn glass-panel" title="Tela Cheia">⛶</button>
-          <button id="btn-audio-toggle" class="hud-mini-btn glass-panel" title="Áudio">🔊</button>
-          <div class="companion-badge glass-panel">
-            <span class="companion-dot"></span>
-            <span class="companion-text">BOT AMIGO: <b id="companion-status">ATIVO</b></span>
+        <!-- 2. Placar e Coletáveis -->
+        <div class="stats-card glass-panel">
+          <div class="stat-item">
+            <span class="stat-icon">🪙</span>
+            <span id="coin-counter" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">💎</span>
+            <span id="gem-counter" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⭐</span>
+            <span id="score-counter" class="stat-value">00000</span>
           </div>
         </div>
-        <div class="radar-box glass-panel">
-          <canvas id="radarCanvas" width="110" height="60"></canvas>
-          <span class="radar-label">RADAR DO MUNDO</span>
+
+        <!-- 3. Radar Minimapa e Ações Topo -->
+        <div class="companion-radar-panel">
+          <div class="top-actions-row">
+            <button id="btn-fullscreen" class="hud-mini-btn glass-panel" title="Tela Cheia">⛶</button>
+            <button id="btn-audio-toggle" class="hud-mini-btn glass-panel" title="Áudio">🔊</button>
+            <div class="companion-badge glass-panel">
+              <span class="companion-dot"></span>
+              <span class="companion-text">BOT: <b id="companion-status">ATIVO</b></span>
+            </div>
+          </div>
+          <div class="radar-box glass-panel">
+            <canvas id="radarCanvas" width="96" height="50"></canvas>
+            <span class="radar-label">RADAR DO MUNDO</span>
+          </div>
         </div>
       </div>
     </div>
@@ -89,7 +95,7 @@
     <div id="game-toast" class="game-toast hidden"></div>
 
     <!-- CONTROLES TOUCH MOBILE COMPLETOS -->
-    <!-- 1. ESQUERDA: BOTÕES DIRECIONAIS CLAROS + ÁREA ANALÓGICA -->
+    <!-- ESQUERDA: BOTÕES ◀ e ▶ -->
     <div id="touch-controls-left" class="touch-controls-left">
       <div class="dpad-cluster">
         <button id="btn-left" class="t-btn btn-dir btn-dir-left" aria-label="Mover para Esquerda">
@@ -102,7 +108,7 @@
         </button>
       </div>
 
-      <!-- Joystick Analógico Flutuante que acompanha o dedo -->
+      <!-- Joystick Analógico Flutuante que acompanha o toque livre -->
       <div id="virtual-joystick" class="virtual-joystick hidden">
         <div class="joystick-base">
           <div id="joystick-stick" class="joystick-stick"></div>
@@ -111,7 +117,7 @@
       </div>
     </div>
 
-    <!-- 2. DIREITA: BOTÕES DE AÇÃO TOUCH ERGONÔMICOS -->
+    <!-- DIREITA: BOTÕES DE AÇÃO TOUCH (PULO, ESPADA, TIRO, DASH) -->
     <div id="touch-controls-right" class="touch-controls-right">
       <div class="action-cluster">
         <div class="action-row">
@@ -140,15 +146,20 @@
     <!-- Tela Inicial / Menu -->
     <div id="start-screen" class="screen-modal active">
       <div class="modal-card">
-        <div class="badge-hero">⚔️ VERSÃO ÉPICA 2.0 • TOUCH NO CELULAR</div>
+        <div class="badge-hero">⚔️ VERSÃO 2.0 • TELA LIMPA & TOUCH</div>
         <h1 class="game-title">AS AVENTURAS DE <span class="highlight">GABRIEL</span></h1>
         <p class="subtitle">O Mundo das Plataformas & Bots Autônomos</p>
 
         <div class="features-grid">
           <div class="feat-card">
+            <span class="feat-icon">👁️</span>
+            <h4>Visão Limpa do Jogo</h4>
+            <p>Toque no botão <b>"OCULTAR HUD"</b> no topo a qualquer momento para sumir com todas as janelas e ver 100% do cenário!</p>
+          </div>
+          <div class="feat-card">
             <span class="feat-icon">📱</span>
             <h4>Botões Touch Visíveis</h4>
-            <p>Botões ◀ e ▶ grandes na esquerda para andar e ⬆️ na direita para pular.</p>
+            <p>Botões <b>◀</b> e <b>▶</b> para andar e <b>⬆️</b> para pular sem complicação.</p>
           </div>
           <div class="feat-card">
             <span class="feat-icon">🤖</span>
@@ -158,20 +169,15 @@
           <div class="feat-card">
             <span class="feat-icon">🛡️</span>
             <h4>Bot Amigo</h4>
-            <p>Drone companheiro que voa com você, atira nos inimigos e atrai moedas.</p>
-          </div>
-          <div class="feat-card">
-            <span class="feat-icon">✨</span>
-            <h4>Gráficos HD Retina</h4>
-            <p>Parallax espacial, iluminação neon, partículas e tela cheia.</p>
+            <p>Drone companheiro que voa ao seu lado, atira nos inimigos e atrai moedas.</p>
           </div>
         </div>
 
         <div class="controls-guide">
-          <h3>🎮 CONTROLES:</h3>
+          <h3>🎮 COMO JOGAR:</h3>
           <div class="keys-list">
-            <span><b>📱 Celular:</b> Segure <b>◀</b> ou <b>▶</b> para andar; toque em <b>PULAR</b>, <b>ESPADA</b>, <b>TIRO</b> e <b>DASH</b>.</span>
-            <span><b>💻 Teclado:</b> <kbd>A</kbd>/<kbd>D</kbd> andar, <kbd>Espaço</kbd> pulo duplo, <kbd>J</kbd> espada, <kbd>K</kbd> tiro, <kbd>L</kbd> dash.</span>
+            <span><b>📱 No Celular:</b> Segure <b>◀</b> ou <b>▶</b> para andar; toque em <b>PULAR</b>, <b>ESPADA</b>, <b>TIRO</b> e <b>DASH</b>.</span>
+            <span><b>💻 No Teclado:</b> <kbd>A</kbd>/<kbd>D</kbd> andar, <kbd>Espaço</kbd> pulo duplo, <kbd>J</kbd> espada, <kbd>K</kbd> tiro, <kbd>H</kbd> ocultar HUD.</span>
           </div>
         </div>
 
