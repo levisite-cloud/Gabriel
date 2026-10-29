@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#050811">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>As Aventuras de Gabriel: O Mundo dos Bots</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Aviso de Orientação Paisagem para Celular -->
+    <div id="orientation-hint" class="orientation-hint hidden">
+      <div class="hint-content">
+        <span class="phone-icon">📱 ➔ 🔄</span>
+        <p>Gire o celular para jogar na horizontal (Paisagem)!</p>
+      </div>
+    </div>
+
+    <!-- HUD Superior Otimizado para Mobile e Desktop -->
+    <div id="hud" class="hud-overlay">
+      <!-- Painel Gabriel -->
+      <div class="player-hud-card glass-panel">
+        <div class="avatar-box">
+          <div class="avatar-icon">🎮</div>
+          <span class="avatar-tag">GABRIEL</span>
+        </div>
+        <div class="bars-container">
+          <!-- Barra de Vida -->
+          <div class="bar-wrapper">
+            <span class="bar-label">HP</span>
+            <div class="bar-track hp-track">
+              <div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
+            </div>
+            <span id="hp-text" class="bar-val">100/100</span>
+          </div>
+          <!-- Barra de Energia / Dash -->
+          <div class="bar-wrapper">
+            <span class="bar-label">SP</span>
+            <div class="bar-track sp-track">
+              <div id="sp-bar" class="bar-fill sp-fill" style="width: 100%;"></div>
+            </div>
+            <span id="sp-text" class="bar-val">100/100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placar e Coletáveis -->
+      <div class="stats-card glass-panel">
+        <div class="stat-item">
+          <span class="stat-icon">🪙</span>
+          <span id="coin-counter" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💎</span>
+          <span id="gem-counter" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⭐</span>
+          <span id="score-counter" class="stat-value">00000</span>
+        </div>
+      </div>
+
+      <!-- Painel do Bot Companheiro e Radar + Botão Tela Cheia -->
+      <div class="companion-radar-panel">
+        <div class="top-actions-row">
+          <button id="btn-fullscreen" class="hud-mini-btn glass-panel" title="Tela Cheia">⛶</button>
+          <button id="btn-audio-toggle" class="hud-mini-btn glass-panel" title="Áudio">🔊</button>
+          <div class="companion-badge glass-panel">
+            <span class="companion-dot"></span>
+            <span class="companion-text">BOT AMIGO: <b id="companion-status">ATIVO</b></span>
+          </div>
+        </div>
+        <div class="radar-box glass-panel">
+          <canvas id="radarCanvas" width="110" height="60"></canvas>
+          <span class="radar-label">RADAR DO MUNDO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notificações Flutuantes no Jogo -->
+    <div id="game-toast" class="game-toast hidden"></div>
+
+    <!-- ZONA TOUCH DINÂMICA PARA CELULAR -->
+    <!-- Área Esquerda: Joystick Analógico Flutuante que aparece ao tocar -->
+    <div id="touch-zone-left" class="touch-zone touch-zone-left">
+      <div id="virtual-joystick" class="virtual-joystick hidden">
+        <div class="joystick-base">
+          <div id="joystick-stick" class="joystick-stick"></div>
+          <div class="joystick-ring"></div>
+        </div>
+      </div>
+      <div class="touch-hint-left">Arraste aqui para mover 🕹️</div>
+    </div>
+
+    <!-- Área Direita: Botões de Ação Ergonômicos e Gestos Touch -->
+    <div id="touch-controls-right" class="touch-controls-right">
+      <div class="action-cluster">
+        <!-- Linha Superior: Disparo e Dash -->
+        <div class="action-row">
+          <button id="btn-dash" class="t-action-btn btn-dash" aria-label="Dash">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-label">DASH</span>
+          </button>
+          <button id="btn-shoot" class="t-action-btn btn-shoot" aria-label="Tiro de Plasma">
+            <span class="btn-icon">💥</span>
+            <span class="btn-label">TIRO</span>
+          </button>
+        </div>
+        <!-- Linha Inferior: Espada e Super Pulo -->
+        <div class="action-row">
+          <button id="btn-attack" class="t-action-btn btn-attack" aria-label="Espada">
+            <span class="btn-icon">⚔️</span>
+            <span class="btn-label">ESPADA</span>
+          </button>
+          <button id="btn-jump" class="t-action-btn btn-jump" aria-label="Pulo">
+            <span class="btn-icon">⬆️</span>
+            <span class="btn-label">PULAR</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tela Inicial / Menu -->
+    <div id="start-screen" class="screen-modal active">
+      <div class="modal-card">
+        <div class="badge-hero">⚔️ VERSÃO ÉPICA 2.0 • CELULAR & PC</div>
+        <h1 class="game-title">AS AVENTURAS DE <span class="highlight">GABRIEL</span></h1>
+        <p class="subtitle">O Mundo das Plataformas & Bots Autônomos</p>
+
+        <div class="features-grid">
+          <div class="feat-card">
+            <span class="feat-icon">📱</span>
+            <h4>Touch no Celular</h4>
+            <p>Analógico virtual flutuante na tela esquerda e botões ergonômicos na direita.</p>
+          </div>
+          <div class="feat-card">
+            <span class="feat-icon">🤖</span>
+            <h4>Bots com IA</h4>
+            <p>Robôs autônomos que patrulham, saltam plataformas e te perseguem.</p>
+          </div>
+          <div class="feat-card">
+            <span class="feat-icon">🛡️</span>
+            <h4>Bot Amigo</h4>
+            <p>Drone companheiro que voa com você, atira nos inimigos e atrai moedas.</p>
+          </div>
+          <div class="feat-card">
+            <span class="feat-icon">✨</span>
+            <h4>Gráficos HD Retina</h4>
+            <p>Parallax espacial, brilho neon, partículas e tela cheia sem travamentos.</p>
+          </div>
+        </div>
+
+        <div class="controls-guide">
+          <h3>🎮 COMO CONTROLAR:</h3>
+          <div class="keys-list">
+            <span><b>📱 No Celular:</b> Arraste o polegar na esquerda para andar; toque na direita para pular, atacar e dash.</span>
+            <span><b>💻 No Teclado:</b> <kbd>A</kbd>/<kbd>D</kbd> mover, <kbd>Espaço</kbd> pulo duplo, <kbd>J</kbd> espada, <kbd>K</kbd> tiro, <kbd>L</kbd> dash.</span>
+          </div>
+        </div>
+
+        <button id="btn-start" class="btn-primary">▶ COMEÇAR AVENTURA!</button>
+      </div>
+    </div>
+
+    <!-- Tela de Game Over -->
+    <div id="game-over-screen" class="screen-modal hidden">
+      <div class="modal-card danger-theme">
+        <div class="danger-icon">💀</div>
+        <h2>GABRIEL CAIU NA BATALHA!</h2>
+        <p>Os bots assumiram a fortaleza, mas você pode tentar novamente!</p>
+        <div class="results-box">
+          <div>Moedas: <b id="go-coins">0</b></div>
+          <div>Inimigos Derrotados: <b id="go-kills">0</b></div>
+          <div>Pontuação Final: <b id="go-score">0</b></div>
+        </div>
+        <button id="btn-restart" class="btn-primary danger-btn">🔄 TENTAR NOVAMENTE</button>
+      </div>
+    </div>
+
+    <!-- Tela de Vitória -->
+    <div id="victory-screen" class="screen-modal hidden">
+      <div class="modal-card victory-theme">
+        <div class="trophy-icon">🏆</div>
+        <h2>VITÓRIA SUPREMA DE GABRIEL!</h2>
+        <p>Você derrotou o Chefão Mecha e conquistou o Mundo das Plataformas!</p>
+        <div class="results-box">
+          <div>Moedas: <b id="vic-coins">0</b></div>
+          <div>Gemas: <b id="vic-gems">0</b></div>
+          <div>Inimigos Vencidos: <b id="vic-kills">0</b></div>
+          <div>Pontuação: <b id="vic-score">0</b></div>
+        </div>
+        <button id="btn-victory-restart" class="btn-primary victory-btn">🌟 JOGAR NOVAMENTE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts do Jogo -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
