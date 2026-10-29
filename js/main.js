@@ -122,14 +122,14 @@ class Game {
       if (hudContent) hudContent.classList.remove('hud-hidden');
       if (toggleBtn) toggleBtn.classList.remove('is-hidden');
       if (toggleIcon) toggleIcon.textContent = '👁️';
-      if (toggleText) toggleText.textContent = 'OCULTAR HUD';
+      if (toggleText) toggleText.textContent = 'OCULTAR PAINEL';
       this.showToast('👁️ Informações da Tela Exibidas');
     } else {
       if (hudContent) hudContent.classList.add('hud-hidden');
       if (toggleBtn) toggleBtn.classList.add('is-hidden');
       if (toggleIcon) toggleIcon.textContent = '🙈';
-      if (toggleText) toggleText.textContent = 'MOSTRAR HUD';
-      this.showToast('🙈 Janelas Ocultadas - Tela 100% Limpa!');
+      if (toggleText) toggleText.textContent = 'MOSTRAR PAINEL';
+      this.showToast('🙈 Painel Ocultado - Tela 100% Limpa!');
     }
     this.vibrate(20);
   }
@@ -476,7 +476,7 @@ class Game {
         this.player.y = this.lastCheckpoint.y - 20;
         this.player.vx = 0;
         this.player.vy = 0;
-        this.showToast('⚠️ Gabriel voltou ao Checkpoint!');
+        this.showToast('⚠️ Gabriel voltou ao Ponto de Retorno!');
       }
     }
 
@@ -565,7 +565,7 @@ class Game {
           plat.activated = true;
           this.lastCheckpoint = { x: plat.x, y: plat.y };
           if (window.soundEngine) window.soundEngine.playGem();
-          this.showToast('🚩 Checkpoint Ativado!');
+          this.showToast('🚩 Ponto de Retorno Ativado! Progresso Salvo.');
           this.vibrate(35);
         }
       }
